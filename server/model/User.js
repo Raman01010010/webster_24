@@ -28,16 +28,16 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    picture:{
-        type:String,
-        default:"xx",
-        required:false
+    picture: {
+        type: String,
+        default: "xx",
+        required: false
     },
     refreshToken: String,
-    location:String,
-    status:[{org:String,role:String,desc:String}],
-   
-    
+    location: String,
+    status: [{ org: String, role: String, desc: String }],
+
+
 });
 
 module.exports = mongoose.model('user_w', userSchema);

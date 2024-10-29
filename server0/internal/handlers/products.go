@@ -1,5 +1,6 @@
 package handlers
 
+
 import (
 	"context"
 	"time"
@@ -117,4 +118,42 @@ func GetAllProducts(c *fiber.Ctx) error {
 
 	return c.JSON(products)
 
+}
+
+type Post struct {
+    HeadTitle string    `json:"head_title" bson:"head_title"`
+    CreatedAt time.Time `json:"created_at" bson:"created_at"`
+}
+
+func CreatePost(c *fiber.Ctx) error {
+    var post Post
+
+    // Parse the request body into the Post struct
+    if err := c.BodyParser(&post); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "cannot parse JSON"})
+    }
+
+    // Validate the Post struct
+    if post.HeadTitle == "" {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "head_title is required"})
+    }
+
+    // Set the CreatedAt field
+    post.CreatedAt = time.Now()
+
+    // Get MongoDB client
+    client, err := db.GetMongoClient()
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "cannot connect to database"})
+    }
+
+    // Insert the Post into MongoDB
+    collection := client.Database(db.Database).Collection("posts")
+    _, err = collection.InsertOne(context.TODO(), post)
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "cannot insert post"})
+    }
+
+    // Return the inserted Post as a JSON response
+    return c.Status(fiber.StatusCreated).JSON(post)
 }

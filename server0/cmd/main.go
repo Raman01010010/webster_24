@@ -25,6 +25,7 @@ func main() {
 
 	app.Post("/api/products", handlers.CreateProduct)
 	app.Get("/api/products", handlers.GetAllProducts)
+	app.Post("/posts", handlers.CreatePost)
 
 	fmt.Println("Hello world")
 
