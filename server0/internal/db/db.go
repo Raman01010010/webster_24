@@ -35,6 +35,5 @@ func GetMongoClient() (*mongo.Client, error) {
 
 		clientInstanceError = err
 	})
-
 	return clientInstance, clientInstanceError
 }

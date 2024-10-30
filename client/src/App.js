@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Home from './component/Home';
 import Navbar from './component/Navbar';
 import Navbar2 from './component/Navbar2';
+import Sidebar from './component/Sidebar';
 import Ram from './sol/Ram';
 function App() {
 
@@ -15,12 +16,14 @@ function App() {
   const [arrivalDate, setArrivalDate] = React.useState('');
   const [departureDate, setDepartureDate] = React.useState('');
    return (
+
     <>
+    
     <User.Provider value={{newUser,setNewUser,loc,setLoc,parkingLots,setParkingLots,arrivalDate,departureDate,setArrivalDate,setDepartureDate}}>
       <Router>
-     {(!newUser.accessToken)&&<Navbar/>}
+     {(!newUser.accessToken)&&<Sidebar/>}
      {(newUser.accessToken)&&<Navbar2/>}
-  
+
       </Router>
     </User.Provider>
     </>

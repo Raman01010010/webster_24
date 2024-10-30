@@ -24,9 +24,7 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isJobMenuOpen, setIsJobMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const location = useLocation();
-
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
