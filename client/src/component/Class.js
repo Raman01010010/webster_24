@@ -14,22 +14,9 @@ const Class = () => {
               placeholder="Name"
             />
           </div>
-          <div>
-            <label className="block text-gray-700">Subject *</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-              <option>Select</option>
-            </select>
-          </div>
+          
         </div>
-
         <div className="grid grid-cols-3 gap-6 mb-4">
-          <div>
-            <label className="block text-gray-700">Mode *</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-              <option>In Person</option>
-              <option>Online</option>
-            </select>
-          </div>
           <div>
             <label className="block text-gray-700">Room</label>
             <input
@@ -49,29 +36,9 @@ const Class = () => {
         </div>
 
         <div className="grid grid-cols-3 gap-6 mb-4">
-          <div>
-            <label className="block text-gray-700">Teacher</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Teacher"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700">Occurs *</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-              <option>Once</option>
-              <option>Weekly</option>
-              <option>Monthly</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700">Date *</label>
-            <input
-              type="date"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+          
+         
+          
         </div>
 
         <div className="grid grid-cols-2 gap-6 mb-4">
