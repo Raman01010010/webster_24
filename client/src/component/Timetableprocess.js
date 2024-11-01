@@ -89,7 +89,6 @@ const CloudinaryToDocsumoUpload = () => {
 
     while (attempts < maxAttempts) {
       const docDataResponse = await fetch(`https://app.docsumo.com/api/v1/eevee/apikey/data/simplified/${docId}/`, options);
-
       if (docDataResponse.ok) {
         const docDataResult = await docDataResponse.json();
         if (docDataResult.status_code === 200) {
@@ -111,7 +110,6 @@ const CloudinaryToDocsumoUpload = () => {
         setMessage('Failed to fetch document data.');
         return;
       }
-
       attempts++;
       await new Promise(resolve => setTimeout(resolve, checkInterval));
     }

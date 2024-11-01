@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import 'tailwindcss/tailwind.css';
 
 const StoryGenerator = () => {
   const [incomingData, setIncomingData] = useState(null);
   const [extractedData, setExtractedData] = useState(null);
+  const [editableData, setEditableData] = useState(null);
   const [message, setMessage] = useState("");
-  
-  const [prompt, setPrompt] = useState("Extract the fields: subject_name, start time, end time, and room. and try to get room number more precisely becuase room number may be combination of letter and number both");
   const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState("Extract the fields: subject_name, start time, end time, day,and room. and try to get room number more precisely becuase room number may be combination of letter and number both ");
   const apiKey = "AIzaSyApSfdsy2-vWOUwWAGjkp9xwoKMuudOL18"; // Use environment variable
 
+
   const extractData = async () => {
-    console.log("Incoming Data:", incomingData);
     setLoading(true);
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Change to the correct model name
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       const response = await model.generateContent(`${prompt}\nIncoming Data: ${JSON.stringify(incomingData)}`);
-      
-      console.log("Response from API:", response); // Log the response
       
       const extracted = response.response.text(); // Ensure this matches the response structure
       console.log("Extracted Data:", extracted); // Log extracted data
@@ -37,19 +36,30 @@ const StoryGenerator = () => {
         console.error("Parsing error:", parseError);
         setMessage('Failed to parse extracted data.');
       }
+        // Check if extracted data is in JSON format
+        // erase 3 start chacter and last 3 character
+        
+      setMessage('Data extraction successful.');
     } catch (error) {
-      console.error("Error during extraction:", error.message, error.stack);
+      console.error("Error during extraction:", error.message);
       setMessage('Failed to extract data. Please check the console for details.');
     } finally {
       setLoading(false);
     }
   };
-
+  const makeDataEditable = () => {
+    setEditableData(JSON.parse(JSON.stringify(extractedData)));
+  };
+  const handleEditChange = (event, index, key) => {
+    const newData = [...editableData];
+    newData[index][key] = event.target.value;
+    setEditableData(newData);
+  };
   const simulateIncomingData = () => {
     const sampleData = [
       {
         prompt:
-          "Generate JSON format timetable containing subjects, start and end times, and room numbers",
+          "Extract the fields: subject_name, start time, end time, day,and room. and try to get room number more precisely becuase room number may be combination of letter and number both and dont give unneccessay things give only the json output so that i can copy it",
         meta_data: {
           title: "Screenshot 2024-10-31 023719.png",
           doc_id: "df475754e31e4dd3a0d1fb3a0d32f709",
@@ -410,32 +420,55 @@ const StoryGenerator = () => {
     ];
     setIncomingData(sampleData); // Set incoming data to the state variable
   };
-
   return (
-    <div>
-     <h2>Random JSON taking data</h2>
-     <button onClick={simulateIncomingData}>Simulate Incoming Data</button>
-      <h1>Data Extractor</h1>
-      
-      {/* Input for incoming data (for demonstration, you can change this according to your needs) */}
+    <div className="p-4 max-w-4xl mx-auto">
+      <h2 className="text-xl font-semibold mb-4">Random JSON Data Extractor</h2>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded mb-4" onClick={simulateIncomingData}>Simulate Incoming Data</button>
+
+      <h1 className="text-2xl font-bold mb-4">Data Extractor</h1>
       <textarea
-        onChange={(e) => setIncomingData(e.target.value)} // Assuming JSON format input
-        rows="4"
-        cols="50"
+        className="border p-2 w-full mb-4 rounded"
+        onChange={(e) => setIncomingData(e.target.value)}
+        rows="6"
         placeholder="Enter incoming data as JSON..."
       />
       
-      <br />
-      <button onClick={extractData} disabled={loading}>
+      <button className={`bg-${loading ? "gray-500" : "green-500"} text-white px-4 py-2 rounded`} onClick={extractData} disabled={loading}>
         {loading ? 'Extracting...' : 'Extract Data'}
       </button>
-      
-      {message && <p>{message}</p>}
-      
+
+      {message && <p className="text-blue-700 mt-4">{message}</p>}
+
       {extractedData && (
-        <div>
-          <h2>Extracted Data:</h2>
-          <pre>{JSON.stringify(extractedData, null, 2)}</pre>
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold">Extracted Data:</h2>
+          <pre className="bg-gray-100 p-4 rounded mb-4">{JSON.stringify(extractedData, null, 2)}</pre>
+          <button className="bg-indigo-500 text-white px-4 py-2 rounded" onClick={makeDataEditable}>
+            Edit Extracted Data
+          </button>
+        </div>
+      )}
+
+      {editableData && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold">Editable Extracted Data</h2>
+          <div className="bg-white shadow-md rounded p-4 space-y-4">
+            {editableData.map((entry, index) => (
+              <div key={index} className="p-2 border-b last:border-0">
+                {Object.keys(entry).map((key) => (
+                  <div key={key} className="flex items-center mb-2">
+                    <label className="w-1/4 font-semibold">{key}:</label>
+                    <input
+                      className="border w-full p-2 rounded"
+                      type="text"
+                      value={entry[key]}
+                      onChange={(e) => handleEditChange(e, index, key)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -443,62 +476,3 @@ const StoryGenerator = () => {
 };
 
 export default StoryGenerator;
-
-     
-     
-/*
-
-import React, { useState } from "react";
-import axios from "axios";
-
-const JsonToGemini = () => {
-  
-
-
-
-    // Check if extraction was successful and format data
-    if (response.status === 200 && response.data) {
-      // Assuming the response contains the required fields in a structured format
-      const extracted = response.data.map((item) => ({
-        subject_name: item.subject_name || "Unknown",
-        start: item.start || "Unknown",
-        end: item.end || "Unknown",
-        room: item.room || "Unknown",
-      }));
-      setExtractedData(extracted);
-      setMessage("Data extraction successful.");
-    } else {
-      setMessage("Extraction failed or fields missing.");
-    }
-  } catch (error) {
-    console.error("Error during extraction:", error); // Log the full error object
-    if (error.response) {
-      console.error("Response data:", error.response.data); // Log response data if available
-      console.error("Response status:", error.response.status); // Log response status
-      console.error("Response headers:", error.response.headers); // Log response headers
-    } else if (error.request) {
-      console.error("Request data:", error.request); // Log request data if no response was received
-    } else {
-      console.error("Error message:", error.message); // Log any other error messages
-    }
-    setMessage("Extraction failed. Check console for details.");
-  }
-};
-
-  
-
-  // Function to simulate setting incoming data (you can replace this with actual data fetching logic)
- 
-
-  return (
-    <div>
-      
-      <button onClick={sendDataToGemini}>Extract Data</button>
-      {message && <p>{message}</p>}
-      {extractedData && <pre>{JSON.stringify(extractedData, null, 2)}</pre>}
-    </div>
-  );
-};
-
-export default JsonToGemini;
-*/

@@ -14,9 +14,6 @@ const Class = () => {
               placeholder="Name"
             />
           </div>
-          
-        </div>
-        <div className="grid grid-cols-3 gap-6 mb-4">
           <div>
             <label className="block text-gray-700">Room</label>
             <input
@@ -24,22 +21,21 @@ const Class = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Room"
             />
-          </div>
-          <div>
-            <label className="block text-gray-700">Building</label>
+              </div>
+        </div>
+        <div className="grid grid-cols-3 gap-6 mb-4">
+        <div>
+            <label className="block text-gray-700">Day</label>
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Building"
+              placeholder="Day"
             />
           </div>
+         
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-4">
-          
-         
-          
-        </div>
+      
 
         <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
