@@ -107,24 +107,24 @@ class SimpleSFUClient {
     }
 
     createVideoWrapper(video, username, consumerId) {
-        const existingDiv = document.getElementById(`user_${username}`);
-    
-        // If the div already exists, return it and skip creating a new one
-        if (existingDiv) {
-            console.log(`Div with id user_${username} already exists.`);
-            return existingDiv;
-        }
-    
-        // If the div doesn't exist, create a new one
-        const div = document.createElement('div');
-        div.id = `user_${username}`;
-        div.classList.add('videoWrap');
-        div.appendChild(this.createDisplayName(username));
-        div.appendChild(video);
-    
-        return div;
+    const existingDiv = document.getElementById(`user_${username}`);
+
+    // If the div already exists, return it and skip creating a new one
+    if (existingDiv) {
+        console.log(`Div with id user_${username} already exists.`);
+        return existingDiv;
     }
-    
+
+    // If the div doesn't exist, create a new one
+    const div = document.createElement('div');
+    div.id = `user_${username}`;
+    div.classList.add('videoWrap');
+    div.appendChild(this.createDisplayName(username));
+    div.appendChild(video);
+
+    return div;
+}
+
 
     async handleRemoteTrack(stream, username, consumerId) {
         const userVideo = this.findUserVideo(consumerId);
