@@ -155,5 +155,5 @@ func CreatePost(c *fiber.Ctx) error {
     }
 
     // Return the inserted Post as a JSON response
-    return c.Status(fiber.StatusCreated).JSON(post)
+    return c.Status(fiber.StatusCreated).JSON(fiber.Map{"raman": "ram is required"})
 }

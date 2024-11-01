@@ -5,6 +5,8 @@ import Signup from "./Signup";
 import AboutUs from "./AboutUs";
 import Otp from "./Otp";
 import Persist from "./Persist";
+import Streamer from "./Streamer";
+import Ram from "./Ram";
 
 export default function Container1(){
     return(<>
@@ -16,6 +18,8 @@ export default function Container1(){
           <Route path="/otp" element={<><Otp/></>} />
           <Route path="/home2" element={<><Home/></>} />
           <Route path="/about" element={<><AboutUs/></>} />
+          <Route path="/s" element={<><Streamer/></>} />
+          <Route path="/ram" element={<><Ram/></>} />
          
     </Routes>
 
