@@ -1,0 +1,21 @@
+# .air.toml
+root = "."
+tmp_dir = "tmp"
+build_cmd = "go build -o tmp/main ./cmd"
+run_cmd = "tmp/main"
+
+watch_dir = "."
+watch_ext = ["go"]
+exclude_dir = ["tmp", "vendor"]
+
+[env]
+  ENV = "development"
+
+[build]
+  command = "go build -o tmp/main ./cmd"
+
+show_log = true
+
+[server]
+  port = 3000
+  host = "localhost"

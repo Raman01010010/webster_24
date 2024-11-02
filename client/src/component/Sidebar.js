@@ -2,16 +2,11 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Container1 from "./Container1";
 import Class from "./Class"; // Import the Class component
-
 const Sidebar = () => {
   const location = useLocation();
-  // State to manage sidebar visibility on small screens
   const [isOpen, setIsOpen] = useState(false);
-  // State to manage the visibility of additional options
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  // State to manage the modal visibility for "Add Class"
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
-  // Toggle the sidebar visibility
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };

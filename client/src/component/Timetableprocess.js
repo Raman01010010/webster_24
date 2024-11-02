@@ -1,179 +1,175 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import 'tailwindcss/tailwind.css';
 
-const CloudinaryToDocsumoUpload = () => {
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState('');
-  const [docData, setDocData] = useState(null);
-  const [uploadedUrls, setUploadedUrls] = useState([]);
-  const [extractedData, setExtractedData] = useState(null);
+const ImageUploadAndEdit = () => {
+    const [file, setFile] = useState(null);
+    const [message, setMessage] = useState('');
+    const [editableData, setEditableData] = useState([]);
+    const [extractedData, setExtractedData] = useState([]);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
-
-  const handleUpload = async (event) => {
-    event.preventDefault();
-    if (!file) {
-      setMessage('Please select a file to upload.');
-      return;
-    }
-
-    const existingUrl = uploadedUrls.find(url => url.fileName === file.name);
-    if (existingUrl) {
-      setMessage('File already uploaded.');
-      console.log('Existing Cloudinary URL:', existingUrl.url);
-      await uploadToDocsumo(existingUrl.url);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'WEBSTER_2024');
-
-    try {
-      const cloudinaryResponse = await axios.post('https://api.cloudinary.com/v1_1/deafbhwzg/upload', formData);
-      if (cloudinaryResponse.status === 200) {
-        const cloudinaryUrl = cloudinaryResponse.data.secure_url;
-        console.log('Cloudinary URL:', cloudinaryUrl);
-        setUploadedUrls(prev => [...prev, { fileName: file.name, url: cloudinaryUrl }]);
-        await uploadToDocsumo(cloudinaryUrl);
-      }
-    } catch (error) {
-      console.error('Error during upload:', error);
-      setMessage('Upload failed.');
-    }
-  };
-
-  const uploadToDocsumo = async (cloudinaryUrl) => {
-    const docsumoForm = new FormData();
-    docsumoForm.append('file_type', 'url');
-    docsumoForm.append('file', cloudinaryUrl);
-    docsumoForm.append('type', 'Table Extractor');
-
-    const docsumoOptions = {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        apikey: 'haRMNPOZXJk77KTUmu7sJ6ULE2u3nM9ohsj46Xy0rr3lddXDvj87wrTjDKTX',
-      },
-      body: docsumoForm,
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
     };
 
-    const docsumoResponse = await fetch('https://app.docsumo.com/api/v1/eevee/apikey/upload/custom/', docsumoOptions);
-    const docsumoResult = await docsumoResponse.json();
+    const csvToJson = (csv) => {
+        const rows = csv.trim().split("\n").map(row => row.split(","));
+        const headers = rows[0].map(header => header.trim());
 
-    if (docsumoResponse.ok) {
-      const docId = docsumoResult.data.document[0].doc_id;
-      setMessage('Upload successful!');
-      console.log('Docsumo response:', docsumoResult);
-      await pollForDocumentData(docId);
-    } else {
-      console.error('Docsumo error response:', docsumoResult);
-      setMessage(`Upload to Docsumo failed: ${docsumoResult.message || 'Unknown error'}`);
-    }
-  };
+        const jsonData = rows.slice(1).map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index] ? row[index].trim() : null;
+            });
+            return obj;
+        });
 
-  const pollForDocumentData = async (docId) => {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        apikey: 'haRMNPOZXJk77KTUmu7sJ6ULE2u3nM9ohsj46Xy0rr3lddXDvj87wrTjDKTX',
-      },
+        return jsonData.filter(item => item.subject_name); // Filter out entries without a subject_name
     };
 
-    const checkInterval = 5000;
-    const maxAttempts = 10;
-    let attempts = 0;
-
-    while (attempts < maxAttempts) {
-      const docDataResponse = await fetch(`https://app.docsumo.com/api/v1/eevee/apikey/data/simplified/${docId}/`, options);
-      if (docDataResponse.ok) {
-        const docDataResult = await docDataResponse.json();
-        if (docDataResult.status_code === 200) {
-          setDocData(docDataResult);
-          console.log('Document Data:', docDataResult);
-          setMessage('Document data fetched successfully.');
-          await sendDataToGemini(docDataResult); // Send data to Gemini once fetched
-          return;
-        } else if (docDataResult.message === 'document still processing') {
-          console.log('Document still processing, checking again...');
-        } else {
-          console.error('Error fetching document data:', docDataResult);
-          setMessage('Failed to fetch document data.');
-          return;
+    const handleUpload = async (event) => {
+        event.preventDefault();
+        if (!file) {
+            setMessage('Please select a file to upload.');
+            return;
         }
-      } else {
-        const errorText = await docDataResponse.text();
-        console.error('Error fetching document data:', errorText);
-        setMessage('Failed to fetch document data.');
-        return;
-      }
-      attempts++;
-      await new Promise(resolve => setTimeout(resolve, checkInterval));
-    }
-    setMessage('Document processing is taking longer than expected.');
-  };
 
-  const sendDataToGemini = async (incomingData) => {
-    const geminiUrl = 'https://api.gemini.com/v1/extract'; // Replace with the actual Gemini API endpoint
-    const apiKey = "AIzaSyApSfdsy2-vWOUwWAGjkp9xwoKMuudOL18";
-    const requestPayload = {
-      data: incomingData,
-      prompt: "Extract the fields: subject_name, start time, end time, and room."
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await axios.post('http://localhost:3000/api/imagedata', formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+              },
+          });
+      
+          console.log("response", response); // Log the complete response
+      
+          const fullData = response.data;
+          console.log("fulldata",fullData);
+          if (typeof fullData.extracted === 'string') {
+            try {
+                fullData.extracted = JSON.parse(fullData.extracted); // Parse the string into an object
+                console.log("Parsed fullData.extracted:", fullData.extracted);
+            } catch (parseError) {
+                console.error('Error parsing extracted data:', parseError);
+                setMessage('Failed to parse extracted data.');
+                return; // Exit the function if parsing fails
+            }
+        }
+          // Step-by-step checks with logging
+          if (fullData.extracted) {
+              console.log("fullData.extracted exists.");
+                
+              if (fullData.extracted.Candidates) {
+                  console.log("fullData.extracted.Candidates exists.");
+                  if (fullData.extracted.Candidates.length > 0) {
+                      console.log("Candidates found:", fullData.extracted.Candidates);
+                      
+                      const parts = fullData.extracted.Candidates[0].Content.Parts.map(part => part.slice(3, -3));
+                      
+                      // Log extracted parts for debugging
+                      console.log("Extracted parts:", parts);
+                      
+                      if (parts.length > 0 && parts[0]) {
+                          const bigData = csvToJson(parts[0]);
+                          console.log("Parsed CSV data:", bigData); // Log parsed data for verification
+                          
+                          if (bigData.length > 0) {
+                              setExtractedData(bigData);
+                              setEditableData(bigData);
+                              setMessage('Image uploaded successfully. Extracted data is available for editing.');
+                          } else {
+                              setMessage('No valid CSV data found after parsing.');
+                          }
+                      } else {
+                          setMessage('No valid CSV data found in parts.');
+                      }
+                  } else {
+                      setMessage('No candidates found in the extracted data.');
+                  }
+              } else {
+                  setMessage('No candidates key found in extracted data.');
+              }
+          } else {
+              setMessage('No extracted data found in response.');
+          }
+      } catch (error) {
+          console.error('Error uploading image:', error);
+          setMessage('Failed to upload image. Please try again.');
+      }
+      
+    };
+    const handleEditChange = (event, index, key) => {
+        const newData = [...editableData];
+        newData[index][key] = event.target.value;
+        setEditableData(newData);
     };
 
-    try {
-      const response = await axios.post(geminiUrl, requestPayload, {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
+    const sendData = async () => {
+        try {
+            await axios.post('http://localhost:3000/api/save', { data: editableData });
+            setMessage('Data saved successfully.');
+        } catch (error) {
+            console.error('Error saving data:', error);
+            setMessage('Failed to save data.');
+        }
+    };
 
-      if (response.status === 200 && response.data) {
-        const extracted = response.data.map((item) => ({
-          subject_name: item.subject_name || 'Unknown',
-          start: item.start || 'Unknown',
-          end: item.end || 'Unknown',
-          room: item.room || 'Unknown',
-        }));
-        setExtractedData(extracted);
-        setMessage('Data extraction successful.');
-      } else {
-        setMessage('Extraction failed or fields missing.');
-      }
-    } catch (error) {
-      console.error('Error during extraction:', error);
-      setMessage('Extraction failed. Check console for details.');
-    }
-  };
+    return (
+        <div className="p-4 max-w-4xl mx-auto bg-white shadow-md rounded">
+            <h1 className="text-2xl font-bold mb-4 text-center">Image Upload and Data Extractor</h1>
+            <form onSubmit={handleUpload} className="flex flex-col items-center mb-4">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="mb-2 border p-2 rounded"
+                    required
+                />
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+                    Upload Image
+                </button>
+            </form>
+            {message && <p className="text-red-500 mb-4">{message}</p>}
 
-  return (
-    <div>
-      <h1>Upload File to Cloudinary and Docsumo</h1>
-      <form onSubmit={handleUpload}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit">Upload</button>
-      </form>
-      {message && <p>{message}</p>}
-
-      {/* Display document data and extracted data */}
-      {docData && (
-        <div className="p-2 rounded-md bg-green-100 mt-4">
-          <h2 className="font-bold">Document Data:</h2>
-          <pre>{JSON.stringify(docData, null, 2)}</pre>
+            {extractedData.length > 0 && (
+                <div className="mt-6">
+                    <h2 className="text-xl font-semibold">Extracted Data:</h2>
+                    <pre className="bg-gray-100 p-4 rounded mb-4">{JSON.stringify(extractedData, null, 2)}</pre>
+                    {editableData.length > 0 && (
+                        <div className="mt-4">
+                            <h2 className="text-xl font-semibold">Editable Extracted Data</h2>
+                            <div className="bg-white shadow-md rounded p-4 space-y-4">
+                                {editableData.map((entry, index) => (
+                                    <div key={index} className="p-2 border-b last:border-0">
+                                        {Object.keys(entry).map((key) => (
+                                            <div key={key} className="flex items-center mb-2">
+                                                <label className="w-1/4 font-semibold">{key}:</label>
+                                                <input
+                                                    className="border w-full p-2 rounded"
+                                                    type="text"
+                                                    value={entry[key]}
+                                                    onChange={(e) => handleEditChange(e, index, key)}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                                <button
+                                    className="bg-green-500 text-white px-4 py-2 rounded"
+                                    onClick={sendData}
+                                >
+                                    Save Edited Data
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
-      )}
-      {extractedData && (
-        <div className="p-2 rounded-md bg-blue-100 mt-4">
-          <h2 className="font-bold">Extracted Data:</h2>
-          <pre>{JSON.stringify(extractedData, null, 2)}</pre>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
-export default CloudinaryToDocsumoUpload;
+export default ImageUploadAndEdit;
