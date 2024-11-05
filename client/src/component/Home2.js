@@ -77,7 +77,7 @@ const Home2 = () => {
       <Element name="home2">
         <div style={pageStyle}>
           <div className="text-center bg-purple-600	 text-white p-4">
-            <h1 className="text-6xl mb-8 font-bold">Welcome to the CRYPTO</h1>
+            <h1 className="text-6xl mb-8 font-bold">Welcome to the WEBSTER</h1>
             <div className="space-x-4 mt-8">
               <Link to="/signin" className="text-white">
                 <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
