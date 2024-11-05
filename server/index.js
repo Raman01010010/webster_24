@@ -9,6 +9,7 @@ const verifyJWT=require('./middleware/verifyJWT')
 const cookieParser=require('cookie-parser')
 const credentials = require('./middleware/credential')
 const proxy = require('express-http-proxy');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const PORT=process.env.PORT||3500
 const mongoose = require('mongoose');
@@ -31,11 +32,25 @@ app.use(cookieParser())
 app.use('/user',require('./routes/user'))
 app.use('/auth',require('./routes/auth'))
 app.use('/refresh',require('./routes/refresh'))
-
-//
-
 app.use(verifyJWT)
-app.use('/service1', proxy('http://localhost:3501'));
+//
+console.log("aaya")
+app.use('/api/products', createProxyMiddleware({
+    target: 'http://127.0.0.1:3000/api/products',      // Target server
+    changeOrigin: true,                   // Adjust origin to match target URL
+    pathRewrite: { '^/api/products': '' }, // Remove '/api/products' from the forwarded path
+    onError: (err, req, res) => {         // Error handling for proxy failures
+      console.error('Proxy error:', err.message);  // Log the error message
+      res.status(500).json({ 
+        error: 'Failed to connect to target server', 
+        details: err.message 
+      });
+    }
+  }));
+  
+
+
+
 
 
 app.all('/*',(req,res)=>{

@@ -10,10 +10,10 @@ import (
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 )
+
 type ContentResponse struct {
     Parts []string `json:"parts"` // Assuming extracted parts are strings
 }
-
 func GenerateContentFromData(prompt string, incomingData map[string]interface{}) (string, error) {
 	// Assuming you already have a function that creates the context and client
 	ctx := context.Background()

@@ -40,7 +40,7 @@ func main() {
 	// Middleware to log requests
 	app.Use("/api", func(c *fiber.Ctx) error {
 		fmt.Printf("Received %s request for %s\n", c.Method(), c.Path()) // Log method and path
-
+        
 		// Call the next handler
 		err := c.Next()
 		if err != nil {
