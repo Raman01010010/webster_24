@@ -103,28 +103,6 @@ const Home2 = () => {
               {/* </Link> */}
             </div>
 
-            <div className="space-y-8">
-
-<motion.div className="flex items-center p-4 animate__animated animate__fadeInRight">
-  <motion.img
-    ref={ref1}
-    src={img4}
-    alt="Image 1"
-    className="w-2/5 rounded-lg mr-4"
-    initial={{ opacity: 0, x: 50 }}
-    animate={inView1 && isScrollingIn1 ? { opacity: 1, x: 0 } : {}}
-    transition={{ duration: 1 }}
-  />
-  <div className="flex-1">
-    <h1 className="text-4xl">Safe Communication</h1>
-    <p>
-    sample
-    </p>
-  </div>
-</motion.div>
-
-    
-            </div>
           </div>
         </div>
       </Element>
